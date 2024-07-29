@@ -13,9 +13,22 @@
     "url": "https://github.com/K-Phoen/backstage-plugin-grafana.git"
   },
   "publishConfig": {
-    "access": "public",
-    "main": "dist/index.esm.js",
-    "types": "dist/index.d.ts"
+    "access": "public"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./alpha": "./src/alpha.ts",
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "alpha": [
+        "src/alpha.ts"
+      ],
+      "package.json": [
+        "package.json"
+      ]
+    }
   },
   "backstage": {
     "role": "frontend-plugin"
