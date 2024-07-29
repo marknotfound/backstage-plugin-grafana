@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-import { createApiRef, DiscoveryApi, IdentityApi } from '@backstage/core-plugin-api';
-import { QueryEvaluator } from './query';
-import { Alert, Dashboard } from './types';
+import {
+  createApiRef,
+  DiscoveryApi,
+  IdentityApi,
+} from "@backstage/frontend-plugin-api";
+import { QueryEvaluator } from "./query";
+import { Alert, Dashboard } from "./types";
 
 export interface GrafanaApi {
   listDashboards(query: string): Promise<Dashboard[]>;
@@ -47,7 +51,7 @@ interface AlertRule {
 }
 
 export const grafanaApiRef = createApiRef<GrafanaApi>({
-  id: 'plugin.grafana.service',
+  id: "plugin.grafana.service",
 });
 
 export type Options = {
@@ -66,11 +70,11 @@ export type Options = {
   proxyPath?: string;
 };
 
-const DEFAULT_PROXY_PATH = '/grafana/api';
+const DEFAULT_PROXY_PATH = "/grafana/api";
 
 const isSingleWord = (input: string): boolean => {
   return input.match(/^[\w-]+$/g) !== null;
-}
+};
 
 class Client {
   private readonly discoveryApi: DiscoveryApi;
@@ -105,7 +109,10 @@ class Client {
     return this.dashboardsForQuery(domain, query);
   }
 
-  async dashboardsForQuery(domain: string, query: string): Promise<Dashboard[]> {
+  async dashboardsForQuery(
+    domain: string,
+    query: string
+  ): Promise<Dashboard[]> {
     const parsedQuery = this.queryEvaluator.parse(query);
     const response = await this.fetch<Dashboard[]>(`/api/search?type=dash-db`);
     const allDashboards = this.fullyQualifiedDashboardURLs(domain, response);
@@ -116,13 +123,18 @@ class Client {
   }
 
   async dashboardsByTag(domain: string, tag: string): Promise<Dashboard[]> {
-    const response = await this.fetch<Dashboard[]>(`/api/search?type=dash-db&tag=${tag}`);
+    const response = await this.fetch<Dashboard[]>(
+      `/api/search?type=dash-db&tag=${tag}`
+    );
 
     return this.fullyQualifiedDashboardURLs(domain, response);
   }
 
-  private fullyQualifiedDashboardURLs(domain: string, dashboards: Dashboard[]): Dashboard[] {
-    return dashboards.map(dashboard => ({
+  private fullyQualifiedDashboardURLs(
+    domain: string,
+    dashboards: Dashboard[]
+  ): Dashboard[] {
+    return dashboards.map((dashboard) => ({
       ...dashboard,
       url: domain + dashboard.url,
       folderUrl: domain + dashboard.folderUrl,
@@ -130,7 +142,7 @@ class Client {
   }
 
   private async apiUrl() {
-    const proxyUrl = await this.discoveryApi.getBaseUrl('proxy');
+    const proxyUrl = await this.discoveryApi.getBaseUrl("proxy");
     return proxyUrl + this.proxyPath;
   }
 
@@ -143,7 +155,7 @@ class Client {
       headers: {
         ...headers,
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      }
+      },
     };
   }
 }
@@ -162,15 +174,15 @@ export class GrafanaApiClient implements GrafanaApi {
   }
 
   async alertsForSelector(dashboardTag: string): Promise<Alert[]> {
-    const response = await this.client.fetch<GrafanaAlert[]>(`/api/alerts?dashboardTag=${dashboardTag}`);
+    const response = await this.client.fetch<GrafanaAlert[]>(
+      `/api/alerts?dashboardTag=${dashboardTag}`
+    );
 
-    return response.map(alert => (
-      {
-        name: alert.name,
-        state: alert.state,
-        url: `${this.domain}${alert.url}?panelId=${alert.panelId}&fullscreen&refresh=30s`,
-      }
-    ));
+    return response.map((alert) => ({
+      name: alert.name,
+      state: alert.state,
+      url: `${this.domain}${alert.url}?panelId=${alert.panelId}&fullscreen&refresh=30s`,
+    }));
   }
 }
 
@@ -188,18 +200,25 @@ export class UnifiedAlertingGrafanaApiClient implements GrafanaApi {
   }
 
   async alertsForSelector(selector: string): Promise<Alert[]> {
-    const response = await this.client.fetch<Record<string, AlertRuleGroupConfig[]>>('/api/ruler/grafana/api/v1/rules');
-    const rules = Object.values(response).flat().map(ruleGroup => ruleGroup.rules).flat();
-    const [label, labelValue] = selector.split('=');
+    const response = await this.client.fetch<
+      Record<string, AlertRuleGroupConfig[]>
+    >("/api/ruler/grafana/api/v1/rules");
+    const rules = Object.values(response)
+      .flat()
+      .map((ruleGroup) => ruleGroup.rules)
+      .flat();
+    const [label, labelValue] = selector.split("=");
 
-    const matchingRules = rules.filter(rule => rule.labels && rule.labels[label] === labelValue);
+    const matchingRules = rules.filter(
+      (rule) => rule.labels && rule.labels[label] === labelValue
+    );
 
-    return matchingRules.map(rule => {
+    return matchingRules.map((rule) => {
       return {
         name: rule.grafana_alert.title,
         url: `${this.domain}/alerting/grafana/${rule.grafana_alert.uid}/view`,
         state: "n/a",
       };
-    })
+    });
   }
 }
