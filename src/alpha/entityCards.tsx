@@ -19,6 +19,9 @@ export const entityGrafanaAlertsCard = createEntityCardExtension({
     import("../components/AlertsCard").then((m) => <m.AlertsCard />),
 });
 
+/**
+ * @alpha
+ */
 export const entityGrafanaOverviewDashboardViewer = createEntityCardExtension({
   name: "overview-dashboard",
   loader: () =>
