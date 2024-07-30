@@ -31,7 +31,11 @@
     }
   },
   "backstage": {
-    "role": "frontend-plugin"
+    "role": "frontend-plugin",
+    "pluginId": "grafana",
+    "pluginPackages": [
+      "@k-phoen/backstage-plugin-grafana"
+    ]
   },
   "scripts": {
     "start": "backstage-cli package start",
@@ -54,8 +58,8 @@
     "react-use": "^17.2.4"
   },
   "peerDependencies": {
-    "react": "^16.13.1 || ^17.0.0",
-    "react-dom": "^16.13.1 || ^17.0.0"
+    "react": "^16.13.1 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.13.1 || ^17.0.0 || ^18.0.0"
   },
   "devDependencies": {
     "@backstage/cli": "^0.22.5",
@@ -67,8 +71,8 @@
     "@types/jest": "^26.0.7",
     "@types/node": "^14.14.32",
     "cross-fetch": "^3.0.6",
-    "react": "^16.13.1 || ^17.0.0",
-    "react-dom": "^16.13.1",
+    "react": "^16.13.1 || ^17.0.0 || ^18.0.0",
+    "react-dom": "^16.13.1 || ^17.0.0 || ^18.0.0",
     "react-router": "^6.3.0",
     "react-router-dom": "^6.3.0"
   },
